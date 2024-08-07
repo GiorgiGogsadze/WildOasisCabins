@@ -30,7 +30,6 @@ export default function DateSelector({
   bookedDates,
   cabin,
 }: DateSelectorProps) {
-  console.log("nono");
   const [range, setRange]: [any, any] = useState(initialRange);
 
   function resetRange() {
