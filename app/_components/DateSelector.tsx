@@ -1,39 +1,72 @@
-import { isWithinInterval } from "date-fns";
+"use client";
+import { differenceInDays, isWithinInterval } from "date-fns";
+import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
-function isAlreadyBooked(range, datesArr) {
+function isAlreadyBooked(range: any, datesArr: Date[]) {
   return (
-    range.from &&
-    range.to &&
+    range?.from &&
+    range?.to &&
     datesArr.some((date) =>
       isWithinInterval(date, { start: range.from, end: range.to })
     )
   );
 }
 
-function DateSelector() {
-  // CHANGE
-  const regularPrice = 23;
-  const discount = 23;
-  const numNights = 23;
-  const cabinPrice = 23;
-  const range = { from: null, to: null };
+type DateSelectorProps = {
+  settings: { minBookingLength: number; maxBookingLength: number };
+  bookedDates: Date[];
+  cabin: cabinType;
+};
+
+const initialRange = {
+  from: undefined,
+  to: undefined,
+};
+
+export default function DateSelector({
+  settings,
+  bookedDates,
+  cabin,
+}: DateSelectorProps) {
+  console.log("nono");
+  const [range, setRange]: [any, any] = useState(initialRange);
+
+  function resetRange() {
+    setRange(initialRange);
+  }
+
+  // const numNights = range.to.getdate() - range.to.getdate();
+  const { regularPrice, discount = 0 } = cabin;
+  const numNights = differenceInDays(range.to, range.from);
+  const cabinPrice = numNights * (regularPrice - discount);
 
   // SETTINGS
-  const minBookingLength = 1;
-  const maxBookingLength = 23;
+  const { minBookingLength, maxBookingLength } = settings;
 
   return (
-    <div className="flex flex-col justify-between">
+    <div className="flex flex-col justify-between gap-2">
+      <p className="text-center text-lg">
+        minimum number of nights: {minBookingLength} | maximum:{" "}
+        {maxBookingLength}
+      </p>
       <DayPicker
         className="pt-12 place-self-center"
         mode="range"
-        min={minBookingLength + 1}
+        disabled={bookedDates}
+        onSelect={(r) => {
+          const nr = { from: r?.from, to: r?.to ?? r?.from };
+          isAlreadyBooked(r, bookedDates)
+            ? setRange({ from: undefined, to: undefined })
+            : setRange(nr);
+        }}
+        selected={range}
+        min={minBookingLength}
         max={maxBookingLength}
-        fromMonth={new Date()}
-        fromDate={new Date()}
-        toYear={new Date().getFullYear() + 5}
+        startMonth={new Date()}
+        hidden={{ before: new Date() }}
+        endMonth={new Date(new Date().getFullYear() + 5, 0)}
         captionLayout="dropdown"
         numberOfMonths={2}
       />
@@ -78,5 +111,3 @@ function DateSelector() {
     </div>
   );
 }
-
-export default DateSelector;

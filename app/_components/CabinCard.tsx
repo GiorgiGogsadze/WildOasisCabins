@@ -3,15 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 type CabinCardProps = {
-  cabin: {
-    id: number;
-    name: string;
-    maxCapacity: number;
-    regularPrice: number;
-    discount: number;
-    image: string;
-    description: string;
-  };
+  cabin: cabinType;
 };
 export default function CabinCard({ cabin }: CabinCardProps) {
   const { id, name, maxCapacity, regularPrice, discount, image, description } =

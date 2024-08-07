@@ -16,6 +16,8 @@ export const metadata: Metadata = {
     "Luxurious cabin hotel, located in the heart of the Italian Dolomites, surrounded by beautiful mountains and dark forests",
 };
 
+export const experimental_ppr = true;
+
 type layoutProps = { children: ReactNode };
 export default function RootLayout({ children }: layoutProps) {
   return (
@@ -27,6 +29,16 @@ export default function RootLayout({ children }: layoutProps) {
         <div className="flex-1 px-8 py-12 grid ">
           <main className="max-w-7xl mx-auto w-full">{children}</main>
         </div>
+        <footer className="p-8 text-right">
+          <p>
+            The website is developed for personal purposes. Provided information
+            is fictitious.
+          </p>
+          <p>
+            ©{new Date().getFullYear()} by Jonas Schmedtmann and Giorgi
+            Gogsadze.
+          </p>
+        </footer>
       </body>
     </html>
   );

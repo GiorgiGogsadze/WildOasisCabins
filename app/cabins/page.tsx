@@ -1,12 +1,16 @@
 import { Suspense } from "react";
-import CabinLoader from "../_components/CabinLoader";
+import CabinLoader from "@/app/_components/CabinLoader";
 import Cabins from "./Cabins";
 import { Metadata } from "next";
+import Filter from "@/app/_components/Filter";
 
-export const revalidate = 0;
+export const revalidate = 3600; // an hour
 
-type pageProps = {};
-export default function page({}: pageProps) {
+type pageProps = {
+  searchParams: { capacity: string };
+};
+export default function page({ searchParams }: pageProps) {
+  const capacityFilter: string = searchParams?.capacity;
   return (
     <div>
       <h1 className="text-4xl mb-5 text-accent-400 font-medium">
@@ -20,9 +24,11 @@ export default function page({}: pageProps) {
         home away from home. The perfect spot for a peaceful, calm vacation.
         Welcome to paradise.
       </p>
-
-      <Suspense fallback={<CabinLoader />}>
-        <Cabins />
+      <div className="flex justify-end mb-8">
+        <Filter />
+      </div>
+      <Suspense fallback={<CabinLoader />} key={capacityFilter}>
+        <Cabins capacityFilter={capacityFilter} />
       </Suspense>
     </div>
   );

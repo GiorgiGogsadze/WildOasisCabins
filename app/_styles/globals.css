@@ -60,9 +60,36 @@ html {
 
 /* For data picker */
 
-.rdp {
+.rdp-root {
   --rdp-cell-size: 32px !important;
   --rdp-accent-color: theme("colors.accent.500") !important;
   --rdp-background-color: theme("colors.accent.600") !important;
   margin: 0 !important;
+  padding-top: 0 !important;
+}
+.rdp-selected {
+  background-color: theme("colors.accent.500");
+  border-radius: 50%;
+  color: theme("colors.primary.100") !important;
+}
+.rdp-range_middle {
+  color: theme("colors.accent.500") !important;
+}
+.rdp-dropdown_root {
+  border-radius: 5px;
+  padding: 0.5rem !important;
+  cursor: pointer;
+}
+.rdp-dropdown_root:has(> .rdp-dropdown:focus) {
+  background-color: theme("colors.accent.700");
+}
+.rdp-dropdown {
+  padding: 0.5rem !important;
+}
+.rdp-dropdown option {
+  background-color: theme("colors.primary.950");
+  color: theme("colors.primary.100");
+}
+.rdp-dropdown option:disabled {
+  color: gray;
 }

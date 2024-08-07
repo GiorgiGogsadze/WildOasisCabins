@@ -1,7 +1,7 @@
 import Spinner from "@/app/_components/Spinner";
 
 type loadingProps = {};
-export default function CabinLoader({}: loadingProps) {
+export default function loading({}: loadingProps) {
   return (
     <div className="grid items-center justify-center">
       <Spinner />
