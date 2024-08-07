@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useReservation } from "./ReservationContext";
+import { differenceInDays } from "date-fns";
 
 type ReservationFormProps = {
   cabin: cabinType;
@@ -10,23 +12,27 @@ export default function ReservationForm({ cabin }: ReservationFormProps) {
   const { maxCapacity } = cabin;
   const [numGuests, setNumGuests] = useState("");
   const [observations, setObservations] = useState("");
+  const { range } = useReservation();
+  const numNights = differenceInDays(range.to || 0, range.from || 0);
+  const cabinPrice = (cabin.regularPrice - cabin.discount) * numNights;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (numNights === 0) return console.log("wrong range");
     console.log({
-      startDate: "",
-      endDate: "",
-      numNights: 0,
+      startDate: range.from,
+      endDate: range.to,
+      numNights,
       numGuests,
-      cabinPrice: 10,
-      totalPrice: 10,
+      cabinPrice,
+      totalPrice: cabinPrice,
       extrasPrice: 0,
       status: "unconfirmed",
       hasBreakfast: false,
       isPaid: false,
       observations,
       cabinId: cabin.id,
-      guestId: 0,
+      guestId: undefined,
     });
   }
 

@@ -1,8 +1,9 @@
 "use client";
-import { differenceInDays, isWithinInterval } from "date-fns";
+import { addDays, differenceInDays, isWithinInterval, subDays } from "date-fns";
 import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { useReservation } from "./ReservationContext";
 
 function isAlreadyBooked(range: any, datesArr: Date[]) {
   return (
@@ -20,29 +21,25 @@ type DateSelectorProps = {
   cabin: cabinType;
 };
 
-const initialRange = {
-  from: undefined,
-  to: undefined,
-};
-
 export default function DateSelector({
   settings,
   bookedDates,
   cabin,
 }: DateSelectorProps) {
-  const [range, setRange]: [any, any] = useState(initialRange);
+  const { range, setRange, resetRange } = useReservation();
+  if (range.from && isAlreadyBooked(range, bookedDates)) resetRange();
 
-  function resetRange() {
-    setRange(initialRange);
-  }
-
-  // const numNights = range.to.getdate() - range.to.getdate();
   const { regularPrice, discount = 0 } = cabin;
-  const numNights = differenceInDays(range.to, range.from);
+  const numNights = differenceInDays(range.to || 0, range.from || 0);
   const cabinPrice = numNights * (regularPrice - discount);
 
-  // SETTINGS
   const { minBookingLength, maxBookingLength } = settings;
+
+  const disabledArr = [
+    ...bookedDates,
+    { after: addDays(range.from, maxBookingLength) },
+    { before: subDays(range.to, maxBookingLength) },
+  ];
 
   return (
     <div className="flex flex-col justify-between gap-2">
@@ -53,13 +50,8 @@ export default function DateSelector({
       <DayPicker
         className="pt-12 place-self-center"
         mode="range"
-        disabled={bookedDates}
-        onSelect={(r) => {
-          const nr = { from: r?.from, to: r?.to ?? r?.from };
-          isAlreadyBooked(r, bookedDates)
-            ? setRange({ from: undefined, to: undefined })
-            : setRange(nr);
-        }}
+        disabled={disabledArr}
+        onSelect={(r) => setRange({ from: r?.from, to: r?.to ?? r?.from })}
         selected={range}
         min={minBookingLength}
         max={maxBookingLength}
@@ -68,6 +60,8 @@ export default function DateSelector({
         endMonth={new Date(new Date().getFullYear() + 5, 0)}
         captionLayout="dropdown"
         numberOfMonths={2}
+        month={range.from || new Date()}
+        excludeDisabled
       />
 
       <div className="flex items-center justify-between px-8 bg-accent-500 text-primary-800 h-[72px]">
@@ -101,7 +95,7 @@ export default function DateSelector({
         {range.from || range.to ? (
           <button
             className="border border-primary-800 py-2 px-4 text-sm font-semibold"
-            onClick={() => resetRange()}
+            onClick={resetRange}
           >
             Clear
           </button>

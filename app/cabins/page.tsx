@@ -3,6 +3,7 @@ import CabinLoader from "@/app/_components/CabinLoader";
 import Cabins from "./Cabins";
 import { Metadata } from "next";
 import Filter from "@/app/_components/Filter";
+import ReservationReminder from "../_components/ReservationReminder";
 
 export const revalidate = 3600; // an hour
 
@@ -29,6 +30,7 @@ export default function page({ searchParams }: pageProps) {
       </div>
       <Suspense fallback={<CabinLoader />} key={capacityFilter}>
         <Cabins capacityFilter={capacityFilter} />
+        <ReservationReminder />
       </Suspense>
     </div>
   );

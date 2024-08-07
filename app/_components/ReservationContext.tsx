@@ -1,12 +1,33 @@
-// import { createContext, useState } from "react";
+"use client";
 
-// const initialRange = {
-//   from: undefined,
-//   to: undefined,
-// };
+import { createContext, ReactNode, useContext, useState } from "react";
 
-// const ReservationContext = createContext();
+const initialRange = {
+  from: undefined,
+  to: undefined,
+};
 
-// function ReservationProvider() {
-//   const [range, setRange]: [any, any] = useState(initialRange);
-// }
+const ReservationContext = createContext(undefined as any);
+
+function ReservationProvider({ children }: { children: ReactNode }) {
+  const [range, setRange]: [any, any] = useState(initialRange);
+
+  function resetRange() {
+    setRange(initialRange);
+  }
+
+  return (
+    <ReservationContext.Provider value={{ range, setRange, resetRange }}>
+      {children}
+    </ReservationContext.Provider>
+  );
+}
+
+function useReservation() {
+  const context = useContext(ReservationContext);
+  if (context === undefined)
+    throw new Error("Context was used outside provider");
+  return context;
+}
+
+export { ReservationProvider, useReservation };
