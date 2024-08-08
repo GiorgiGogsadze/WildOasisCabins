@@ -7,10 +7,10 @@ import Cabin from "./Cabin";
 
 type pageProps = { params: { cabinId: number } };
 
-export async function generateStaticParams() {
-  const cabins = await getCabins();
-  return cabins.map((el) => ({ cabinId: `${el.id}` }));
-}
+// export async function generateStaticParams() {
+//   const cabins = await getCabins();
+//   return cabins.map((el) => ({ cabinId: `${el.id}` }));
+// }
 
 const getCabinCache = cache(async (cabinId: number) => {
   const cabin: cabinType = await getCabin(cabinId);

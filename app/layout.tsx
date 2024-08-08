@@ -9,6 +9,11 @@ import { Metadata } from "next";
 import { ReservationProvider } from "./_components/ReservationContext";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.BASE_URL ||
+      process.env.VERCEL_URL ||
+      `http://localhost:${process.env.PORT || 3000}`
+  ),
   title: {
     template: "%s | The Wild Oasis",
     default: "Welcome | The Wild Oasis",
