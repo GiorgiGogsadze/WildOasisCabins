@@ -1,9 +1,10 @@
 "use client";
 import { addDays, differenceInDays, isWithinInterval, subDays } from "date-fns";
-import { useState } from "react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker } from "react-day-picker/utc";
 import "react-day-picker/dist/style.css";
 import { useReservation } from "./ReservationContext";
+import { useState } from "react";
+import { UTCDate } from "@date-fns/utc";
 
 function isAlreadyBooked(range: any, datesArr: Date[]) {
   return (
@@ -26,6 +27,7 @@ export default function DateSelector({
   bookedDates,
   cabin,
 }: DateSelectorProps) {
+  const [curMonth, setCurMonth] = useState(new UTCDate());
   const { range, setRange, resetRange } = useReservation();
   if (range.from && isAlreadyBooked(range, bookedDates)) resetRange();
 
@@ -36,7 +38,7 @@ export default function DateSelector({
   const { minBookingLength, maxBookingLength } = settings;
 
   const disabledArr = [
-    ...bookedDates,
+    ...bookedDates.map((el) => new UTCDate(el)),
     { after: addDays(range.from, maxBookingLength) },
     { before: subDays(range.to, maxBookingLength) },
   ];
@@ -55,12 +57,13 @@ export default function DateSelector({
         selected={range}
         min={minBookingLength}
         max={maxBookingLength}
-        startMonth={new Date()}
-        hidden={{ before: new Date() }}
-        endMonth={new Date(new Date().getFullYear() + 5, 0)}
+        startMonth={new UTCDate()}
+        hidden={{ before: new UTCDate() }}
+        endMonth={new UTCDate(new UTCDate().getFullYear() + 5, 0)}
         captionLayout="dropdown"
         numberOfMonths={2}
-        month={range.from || new Date()}
+        month={curMonth}
+        onMonthChange={(a: any) => setCurMonth(a)}
         excludeDisabled
       />
 

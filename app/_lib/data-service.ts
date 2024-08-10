@@ -1,4 +1,5 @@
 import { eachDayOfInterval } from "date-fns";
+import { UTCDate } from "@date-fns/utc";
 import supabase from "@/app/_lib/supabase";
 import { notFound } from "next/navigation";
 
@@ -45,7 +46,6 @@ export const getCabins = async function () {
     throw new Error("Cabins could not be loaded");
   }
 
-  // console.log(data?.[0]?.regularPrice);
   return data;
 };
 
@@ -115,8 +115,8 @@ export async function getBookedDatesByCabinId(cabinId: number | string) {
   const bookedDates = data
     .map((booking) => {
       return eachDayOfInterval({
-        start: new Date(booking.startDate),
-        end: new Date(booking.endDate),
+        start: new UTCDate(`${booking.startDate}Z`),
+        end: new UTCDate(`${booking.endDate}Z`),
       });
     })
     .flat();
@@ -137,9 +137,7 @@ export async function getSettings() {
 
 export async function getCountries() {
   try {
-    const res = await fetch(
-      "https://restcountries.com/v2/all?fields=name,flag"
-    );
+    const res = await fetch(`${process.env.BASE_URL}/api/countries`);
     const countries = await res.json();
     return countries;
   } catch {
@@ -150,7 +148,7 @@ export async function getCountries() {
 /////////////
 // CREATE
 
-export async function createGuest(newGuest: number) {
+export async function createGuest(newGuest: any) {
   const { data, error } = await supabase.from("guests").insert([newGuest]);
 
   if (error) {
@@ -171,7 +169,7 @@ export async function createBooking(newBooking: any) {
 
   if (error) {
     console.error(error);
-    throw new Error("Booking could not be created");
+    throw new Error(error.message);
   }
 
   return data;

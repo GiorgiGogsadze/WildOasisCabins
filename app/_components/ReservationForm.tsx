@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useReservation } from "./ReservationContext";
 import { differenceInDays } from "date-fns";
+import { reserveCabinAction } from "../_lib/actions";
+import { useFormStatus } from "react-dom";
+import SpinnerMini from "./SpinnerMini";
 
 type ReservationFormProps = {
   cabin: cabinType;
@@ -10,37 +13,32 @@ type ReservationFormProps = {
 };
 export default function ReservationForm({ cabin, user }: ReservationFormProps) {
   // CHANGE
-  const { maxCapacity } = cabin;
+  const { id, maxCapacity } = cabin;
   const [numGuests, setNumGuests] = useState("");
   const [observations, setObservations] = useState("");
-  const { range } = useReservation();
+  const { range, resetRange } = useReservation();
   const numNights = differenceInDays(range.to || 0, range.from || 0);
   const cabinPrice = (cabin.regularPrice - cabin.discount) * numNights;
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (numNights === 0) return console.log("wrong range");
-    console.log({
-      startDate: range.from,
-      endDate: range.to,
-      numNights,
-      numGuests,
-      cabinPrice,
-      totalPrice: cabinPrice,
-      extrasPrice: 0,
-      status: "unconfirmed",
-      hasBreakfast: false,
-      isPaid: false,
-      observations,
-      cabinId: cabin.id,
-      guestId: undefined,
-    });
-  }
+  const additionalData: any = {
+    startDate: range.from,
+    endDate: range.to,
+    numNights,
+    cabinPrice,
+    totalPrice: cabinPrice,
+    extrasPrice: 0,
+    status: "unconfirmed",
+    hasBreakfast: false,
+    isPaid: false,
+    cabinId: id,
+    observations,
+    numGuests: +numGuests,
+  };
 
   return (
     <div className="scale-[1.01]">
       <div className="bg-primary-800 text-primary-300 px-16 py-2 flex justify-between items-center">
-        <p>Logged in as</p>
+        <p onClick={() => console.log(range)}>Logged in as</p>
 
         <div className="flex gap-4 items-center">
           <img
@@ -55,7 +53,8 @@ export default function ReservationForm({ cabin, user }: ReservationFormProps) {
 
       <form
         className="bg-primary-900 py-10 px-16 text-lg flex gap-5 flex-col"
-        onSubmit={handleSubmit}
+        onSubmit={resetRange}
+        action={reserveCabinAction.bind(null, additionalData)}
       >
         <div className="space-y-2">
           <label htmlFor="numGuests">How many guests?</label>
@@ -94,12 +93,21 @@ export default function ReservationForm({ cabin, user }: ReservationFormProps) {
 
         <div className="flex justify-end items-center gap-6">
           <p className="text-primary-300 text-base">Start by selecting dates</p>
-
-          <button className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300">
-            Reserve now
-          </button>
+          <Button />
         </div>
       </form>
     </div>
+  );
+}
+
+function Button() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300"
+      disabled={pending}
+    >
+      {pending ? <SpinnerMini /> : "Reserve now"}
+    </button>
   );
 }
