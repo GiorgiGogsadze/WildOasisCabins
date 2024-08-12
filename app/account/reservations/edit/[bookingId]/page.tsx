@@ -1,21 +1,39 @@
-export default function Page() {
+import { updateReservationAction } from "@/app/_lib/actions";
+import { auth } from "@/app/_lib/auth";
+import { getBooking, getCabin } from "@/app/_lib/data-service";
+import SubmitButton from "../../../../_components/SubmitButton";
+import { redirect } from "next/navigation";
+
+type pageProps = { params: { bookingId: number } };
+export default async function page({ params: { bookingId } }: pageProps) {
+  const session: any = await auth();
+  if (!session) throw new Error("You must be logged in");
+  const { guestId } = session.user;
+
+  const booking: bookingType = await getBooking(bookingId);
+
+  if (+booking.guestId != +guestId) redirect("/account/reservations");
   // CHANGE
-  const reservationId = 23;
-  const maxCapacity = 23;
+  const { cabinId, numGuests, observations } = booking;
+  const { maxCapacity } = await getCabin(cabinId);
 
   return (
     <div>
       <h2 className="font-semibold text-2xl text-accent-400 mb-7">
-        Edit Reservation #{reservationId}
+        Edit Reservation #{bookingId}
       </h2>
 
-      <form className="bg-primary-900 py-8 px-12 text-lg flex gap-6 flex-col">
+      <form
+        action={updateReservationAction.bind(null, bookingId)}
+        className="bg-primary-900 py-8 px-12 text-lg flex gap-6 flex-col"
+      >
         <div className="space-y-2">
           <label htmlFor="numGuests">How many guests?</label>
           <select
             name="numGuests"
             id="numGuests"
             className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
+            defaultValue={numGuests}
             required
           >
             <option value="" key="">
@@ -36,13 +54,13 @@ export default function Page() {
           <textarea
             name="observations"
             className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
+            defaultValue={observations}
+            maxLength={1000}
           />
         </div>
 
         <div className="flex justify-end items-center gap-6">
-          <button className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300">
-            Update reservation
-          </button>
+          <SubmitButton>Update reservation</SubmitButton>
         </div>
       </form>
     </div>

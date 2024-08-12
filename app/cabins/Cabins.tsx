@@ -1,6 +1,5 @@
 import { getCabins } from "@/app/_lib/data-service";
 import CabinList from "../_components/CabinList";
-import { unstable_noStore } from "next/cache";
 
 type CabinsProps = {
   capacityFilter: string;

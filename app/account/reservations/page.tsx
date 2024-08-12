@@ -1,19 +1,19 @@
-import ReservationCard from "@/app/_components/ReservationCard";
+import { auth } from "@/app/_lib/auth";
+import { getBookings } from "@/app/_lib/data-service";
 import { Metadata } from "next";
+import ReservationsList from "./ReservationsList";
 
 export const metadata: Metadata = {
   title: "Reservations",
 };
 
 type pageProps = {};
-export default function page({}: pageProps) {
+export default async function page({}: pageProps) {
   // CHANGE
-  const bookings: any[] | null = [];
-
-  if (!bookings || bookings.length === 0)
-    return (
-      <h2 className="text-primary-100 text-3xl text-center">No Bookings</h2>
-    );
+  const session = await auth();
+  const user: any = session?.user;
+  if (!user) throw new Error("Not logged in");
+  const bookings: any = await getBookings(user.guestId);
 
   return (
     <div>
@@ -21,7 +21,7 @@ export default function page({}: pageProps) {
         Your reservations
       </h2>
 
-      {bookings.length === 0 ? (
+      {!bookings || bookings.length === 0 ? (
         <p className="text-lg">
           You have no reservations yet. Check out our{" "}
           <a className="underline text-accent-500" href="/cabins">
@@ -29,11 +29,7 @@ export default function page({}: pageProps) {
           </a>
         </p>
       ) : (
-        <ul className="space-y-6">
-          {bookings.map((booking) => (
-            <ReservationCard booking={booking} key={booking.id} />
-          ))}
-        </ul>
+        <ReservationsList bookings={bookings} />
       )}
     </div>
   );

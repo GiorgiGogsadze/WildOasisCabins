@@ -6,6 +6,7 @@ import { differenceInDays } from "date-fns";
 import { reserveCabinAction } from "../_lib/actions";
 import { useFormStatus } from "react-dom";
 import SpinnerMini from "./SpinnerMini";
+import SubmitButton from "./SubmitButton";
 
 type ReservationFormProps = {
   cabin: cabinType;
@@ -13,23 +14,20 @@ type ReservationFormProps = {
 };
 export default function ReservationForm({ cabin, user }: ReservationFormProps) {
   // CHANGE
-  const { id, maxCapacity } = cabin;
+  const { id, maxCapacity, regularPrice, discount } = cabin;
+
   const [numGuests, setNumGuests] = useState("");
   const [observations, setObservations] = useState("");
   const { range, resetRange } = useReservation();
-  const numNights = differenceInDays(range.to || 0, range.from || 0);
-  const cabinPrice = (cabin.regularPrice - cabin.discount) * numNights;
 
-  const additionalData: any = {
+  const numNights = differenceInDays(range.to || 0, range.from || 0);
+  const cabinPrice = (regularPrice - discount) * numNights;
+
+  const bookingData: any = {
     startDate: range.from,
     endDate: range.to,
     numNights,
     cabinPrice,
-    totalPrice: cabinPrice,
-    extrasPrice: 0,
-    status: "unconfirmed",
-    hasBreakfast: false,
-    isPaid: false,
     cabinId: id,
     observations,
     numGuests: +numGuests,
@@ -53,8 +51,12 @@ export default function ReservationForm({ cabin, user }: ReservationFormProps) {
 
       <form
         className="bg-primary-900 py-10 px-16 text-lg flex gap-5 flex-col"
-        onSubmit={resetRange}
-        action={reserveCabinAction.bind(null, additionalData)}
+        onSubmit={() => {
+          resetRange();
+          setNumGuests("");
+          setObservations("");
+        }}
+        action={reserveCabinAction.bind(null, bookingData)}
       >
         <div className="space-y-2">
           <label htmlFor="numGuests">How many guests?</label>
@@ -88,26 +90,15 @@ export default function ReservationForm({ cabin, user }: ReservationFormProps) {
             onChange={(e) => setObservations(e.target.value)}
             className="px-5 py-3 bg-primary-200 text-primary-800 w-full shadow-sm rounded-sm"
             placeholder="Any pets, allergies, special requirements, etc.?"
+            maxLength={1000}
           />
         </div>
 
         <div className="flex justify-end items-center gap-6">
           <p className="text-primary-300 text-base">Start by selecting dates</p>
-          <Button />
+          <SubmitButton disabled={!numNights}>Reserve now</SubmitButton>
         </div>
       </form>
     </div>
-  );
-}
-
-function Button() {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300"
-      disabled={pending}
-    >
-      {pending ? <SpinnerMini /> : "Reserve now"}
-    </button>
   );
 }

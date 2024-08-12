@@ -3,7 +3,7 @@ import { addDays, differenceInDays, isWithinInterval, subDays } from "date-fns";
 import { DayPicker } from "react-day-picker/utc";
 import "react-day-picker/dist/style.css";
 import { useReservation } from "./ReservationContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UTCDate } from "@date-fns/utc";
 
 function isAlreadyBooked(range: any, datesArr: Date[]) {
@@ -29,7 +29,10 @@ export default function DateSelector({
 }: DateSelectorProps) {
   const [curMonth, setCurMonth] = useState(new UTCDate());
   const { range, setRange, resetRange } = useReservation();
-  if (range.from && isAlreadyBooked(range, bookedDates)) resetRange();
+
+  useEffect(() => {
+    if (range.from && isAlreadyBooked(range, bookedDates)) resetRange();
+  }, [bookedDates, range, resetRange]);
 
   const { regularPrice, discount = 0 } = cabin;
   const numNights = differenceInDays(range.to || 0, range.from || 0);

@@ -1,9 +1,8 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { updateProfileAction } from "@/app/_lib/actions";
-import { useFormStatus } from "react-dom";
-import SpinnerMini from "./SpinnerMini";
+import SubmitButton from "./SubmitButton";
 
 type UpdateProfileFormProps = {
   children: ReactNode;
@@ -71,21 +70,8 @@ export default function UpdateProfileForm({
       </div>
 
       <div className="flex justify-end items-center gap-6">
-        <Button />
+        <SubmitButton>Update profile</SubmitButton>
       </div>
     </form>
-  );
-}
-
-type ButtonProps = {};
-function Button({}: ButtonProps) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      className="bg-accent-500 px-8 py-4 text-primary-800 font-semibold hover:bg-accent-600 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300"
-      disabled={pending}
-    >
-      {pending ? <SpinnerMini /> : "Update profile"}
-    </button>
   );
 }
