@@ -6,7 +6,7 @@ import { useFormStatus } from "react-dom";
 
 type SubmitButtonProps = {
   children: ReactNode;
-  disabled: boolean;
+  disabled?: boolean;
 };
 export default function SubmitButton({
   children,
