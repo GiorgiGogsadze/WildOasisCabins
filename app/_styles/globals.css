@@ -93,3 +93,10 @@ html {
 .rdp-dropdown option:disabled {
   color: gray;
 }
+.rdp-months {
+  justify-content: center;
+}
+
+.calendar .rdp-day_button {
+  pointer-events: none;
+}

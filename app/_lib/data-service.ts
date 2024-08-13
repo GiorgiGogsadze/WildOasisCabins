@@ -124,6 +124,30 @@ export async function getBookedDatesByCabinId(cabinId: number | string) {
   return bookedDates;
 }
 
+export async function getBookedDatesByGuestId(guestId: number | string) {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("guestId", guestId);
+
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not get loaded");
+  }
+
+  // Converting to actual dates to be displayed in the date picker
+  const bookedDates = data
+    .map((booking) => {
+      return eachDayOfInterval({
+        start: new UTCDate(`${booking.startDate}Z`),
+        end: new UTCDate(`${booking.endDate}Z`),
+      });
+    })
+    .flat();
+
+  return bookedDates;
+}
+
 export async function getSettings() {
   const { data, error } = await supabase.from("settings").select("*").single();
 
