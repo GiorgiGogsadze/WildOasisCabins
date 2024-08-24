@@ -33,14 +33,14 @@ export default function ReservationCard({
     throw new Error("Invalid props for ReservationCard");
 
   return (
-    <div className="flex border border-primary-800">
+    <div className="flex flex-col sm:flex-row border border-primary-800">
       <div className="relative h-32 aspect-square">
         <Image
           src={image || ""}
           alt={`Cabin ${name}`}
           fill
           className="object-cover border-r border-primary-800"
-          sizes="130px"
+          sizes="300px"
         />
       </div>
 
@@ -68,7 +68,7 @@ export default function ReservationCard({
           ) &mdash; {format(new Date(endDate), "EEE, MMM dd yyyy")}
         </p>
 
-        <div className="flex gap-5 mt-auto items-baseline">
+        <div className="flex gap-5 mt-auto items-baseline flex-wrap">
           <p className="text-xl font-semibold text-accent-400">${totalPrice}</p>
           <p className="text-primary-300">&bull;</p>
           <p className="text-lg text-primary-300">
@@ -81,7 +81,7 @@ export default function ReservationCard({
       </div>
 
       {!isPast(startDate) && (
-        <div className="flex flex-col border-l border-primary-800 w-[100px]">
+        <div className="flex justify-center sm:flex-col border-l border-primary-800 sm:w-[100px]">
           <Link
             href={`/account/reservations/edit/${id}`}
             className="group flex items-center gap-2 uppercase text-xs font-bold text-primary-300 border-b border-primary-800 flex-grow px-3 hover:bg-accent-600 transition-colors hover:text-primary-900"
